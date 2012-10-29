@@ -1,6 +1,5 @@
 #!/bin/bash
 source config.sh
-
 queryFiles=(`ls $QUERIES_DIR`)
 
 # Empty log file and query file
@@ -37,12 +36,12 @@ do
   fi
 
   # Delimiter for start of actual query.
-  echo "";
-  echo "; -- start timing queries for $queryFile" >> $ALL_QUERY
+  echo "" >> $ALL_QUERY
+  echo "; -- start timing queries for $queryFile " >> $ALL_QUERY
   # Append the actual query 10 times 
   for i in {1..2}
   do
-    echo "; -- Iteration "$i >> $ALL_QUERY
+    #echo "; -- Iteration "$i >> $ALL_QUERY
     cat $QUERIES_DIR/$queryFile >> $ALL_QUERY
   done
   # Delimiter for end of query
@@ -53,7 +52,7 @@ done
 
 # Execute queries
 echo "Executing $ALL_QUERY" | tee -a $BENCHMARK_LOG
-$SHARK_HOME/bin/shark-withinfo -f $ALL_QUERY 2>&1 | tee -a $BENCHMARK_LOG
+$SHARK_HOME/bin/shark-withinfo -f $ALL_QUERY 2>&1 | tee -a $BENCHMARK_LOG 
 # Extract times
 actualQuery=false
 while read line; do
@@ -68,7 +67,7 @@ while read line; do
   if $actualQuery ; then
     if [[ "$line" == Time\ taken* ]] ; then
       echo $line
-    elif [[ "$line" == *--\ Iteration*]]; then
+    elif [[ "$line" == *--\ Iteration* ]]; then
       echo $line
     fi
   fi

@@ -7,7 +7,6 @@ end
 
 # Download scala, spark, shark, and hive to home directory
 # Assumes existence of ~/mesos-ec2, shark-0.9 hive, and scala-2.9.2
-
 Dir.chdir
 if !File.exists?("scala-2.9.2")
   $stderr.puts "Downloading scala..."
@@ -19,7 +18,8 @@ end
 $stderr.puts "Downloading Spark..."
 $stderr.puts `git clone git://github.com/mesos/spark.git` unless File.exists?("spark")
 $stderr.puts "Building branch #{ARGV[0]}. This may take a while."
-$stderr.puts `cd spark; git checkout -b #{ARGV[0]} #{ARGV[0]}; sbt/sbt products && sbt/sbt publish-local`
+$stderr.puts `cd spark; git checkout -b #{ARGV[0]} #{ARGV[0]};`
+$stderr.puts `source config.sh; cd spark; sbt/sbt clean publish-local`
 
 $stderr.puts "Setting up hive(shark-0.9)"
 $stderr.puts `git clone https://github.com/amplab/hive.git` unless File.exists?("hive")
@@ -28,7 +28,7 @@ $stderr.puts `cd hive; git checkout shark-0.9; ant package`
 $stderr.puts "Downloading Shark..."
 $stderr.puts `git clone git://github.com/amplab/shark.git` unless File.exists?("shark")
 $stderr.puts "Building branch #{ARGV[1]}. This may take a while."
-$stderr.puts `cd shark; git checkout -b #{ARGV[1]} #{ARGV[1]}; sbt/sbt products`
+$stderr.puts `source config.sh; cd shark; git checkout -b #{ARGV[1]} #{ARGV[1]}; sbt/sbt products`
 
 $stderr.puts `mesos-ec2/copy-dir spark`
 $stderr.puts `mesos-ec2/copy-dir shark`
