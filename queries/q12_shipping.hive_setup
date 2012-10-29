@@ -1,0 +1,7 @@
+DROP TABLE q12_shipping;
+-- create the result table
+create table q12_shipping(l_shipmode string, high_line_count double, low_line_count double);
+
+set mapred.min.split.size=536870912;
+set hive.exec.reducers.bytes.per.reducer=1225000000;
+

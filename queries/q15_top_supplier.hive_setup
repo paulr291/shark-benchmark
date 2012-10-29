@@ -1,0 +1,12 @@
+DROP TABLE revenue;
+DROP TABLE max_revenue;
+DROP TABLE q15_top_supplier;
+
+-- create result tables
+create table revenue(supplier_no int, total_revenue double); 
+create table max_revenue(max_revenue double); 
+create table q15_top_supplier(s_suppkey int, s_name string, s_address string, s_phone string, total_revenue double);
+
+
+set mapred.min.split.size=536870912;
+
