@@ -38,10 +38,11 @@ do
 
   # Delimiter for start of actual query.
   echo "";
-  echo ";--start timing queries for $queryFile" >> $ALL_QUERY
+  echo "; -- start timing queries for $queryFile" >> $ALL_QUERY
   # Append the actual query 10 times 
   for i in {1..2}
   do
+    echo "; -- Iteration "$i >> $ALL_QUERY
     cat $QUERIES_DIR/$queryFile >> $ALL_QUERY
   done
   # Delimiter for end of query
@@ -66,6 +67,8 @@ while read line; do
   
   if $actualQuery ; then
     if [[ "$line" == Time\ taken* ]] ; then
+      echo $line
+    elif [[ "$line" == *--\ Iteration*]]; then
       echo $line
     fi
   fi
