@@ -46,7 +46,7 @@ do
   done
   # Delimiter for end of query
   echo ";--stop timing queries for $queryFile" >> $ALL_QUERY
-  echo "" >> $ALL_QUERY
+  echo "SHOW TABLES;" >> $ALL_QUERY
 done
 
 
@@ -56,10 +56,10 @@ $SHARK_HOME/bin/shark-withinfo -f $ALL_QUERY 2>&1 | tee -a $BENCHMARK_LOG
 # Extract times
 actualQuery=false
 while read line; do
-  if [[ "$line" == *start\ timing* ]]; then
+  if [[ "$line" == *start\ timing* ]] && [[ "$actualQuery" == "false" ]] ; then
     echo $line
     actualQuery=true
-  elif [[ "$line" == *stop\ timing* ]]; then
+  elif [[ "$line" == *stop\ timing* ]] && $actualQuery ; then
     echo $line
     actualQuery=false
   fi
