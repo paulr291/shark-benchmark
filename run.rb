@@ -23,9 +23,8 @@ $stderr.puts `source ~/shark-benchmark/config.sh; cd spark; sbt/sbt clean publis
 $stderr.puts `cp ~/shark-benchmark/spark-env.sh ~/spark/conf`
 
 $stderr.puts "Setting up hive(shark-0.9)"
-$stderr.puts `yum install ant-antlr.noarch`
 $stderr.puts `git clone https://github.com/amplab/hive.git` unless File.exists?("hive")
-$stderr.puts `cd hive; git checkout shark-0.9; ant package`
+$stderr.puts `cd hive; git checkout -b shark-0.9; ant package`
 
 $stderr.puts "Downloading Shark..."
 $stderr.puts `git clone git://github.com/amplab/shark.git` unless File.exists?("shark")
