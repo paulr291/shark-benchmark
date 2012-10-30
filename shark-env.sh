@@ -1,21 +1,5 @@
 #!/usr/bin/env bash
 
-# Run configurations
-# --------------------------------------------------
-export SHARK_HOME="/root/shark"
-
-# Log of Shark output
-export BENCHMARK_LOG=benchmark.log
-
-# Directory with queries to execute
-export QUERIES_DIR=tpch_q1
-
-# Full query file created by concatenating queries in the directory of queries
-export ALL_QUERY=allQuery.hive
-
-
-# Shark configurations
-# --------------------------------------------------
 # (Required) Amount of memory used per slave node. This should be in the same
 # format as the JVM's -Xmx option, e.g. 300m or 1g.
 export SPARK_MEM=5g
@@ -36,7 +20,7 @@ export HIVE_HOME="/root/hive/build/dist"
 # For running Shark in distributed mode, set the following:
 export HADOOP_HOME="/root/hadoop-mesos"
 export SPARK_HOME="/root/spark"
-export MASTER="ec2-67-202-33-25.compute-1.amazonaws.com:5050"
+export MASTER=""
 export MESOS_NATIVE_LIBRARY=/usr/local/lib/libmesos.so
 
 # (Optional) Extra classpath
@@ -48,4 +32,3 @@ SPARK_JAVA_OPTS="-Dspark.local.dir=/mnt/tmp "
 SPARK_JAVA_OPTS+="-Dspark.kryoserializer.buffer.mb=10 "
 SPARK_JAVA_OPTS+="-verbose:gc -XX:-PrintGCDetails -XX:+PrintGCTimeStamps "
 export SPARK_JAVA_OPTS
-
