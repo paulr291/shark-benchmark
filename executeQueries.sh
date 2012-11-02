@@ -35,13 +35,13 @@ do
     cat $setupFile >> $ALL_QUERY
   fi
 
+  numQueries=`grep -c ";$" $QUERIES_DIR/$queryFile`
   # Delimiter for start of actual query.
   echo "" >> $ALL_QUERY
-  echo "; -- start timing queries for $queryFile " >> $ALL_QUERY
+  echo "; -- start timing queries for $queryFile $numQueries" >> $ALL_QUERY
   # Append the actual query 10 times 
   for i in {1..2}
   do
-    #echo "; -- Iteration "$i >> $ALL_QUERY
     cat $QUERIES_DIR/$queryFile >> $ALL_QUERY
   done
   # Delimiter for end of query
@@ -58,6 +58,9 @@ actualQuery=false
 while read line; do
   if [[ "$line" == *start\ timing* ]] && [[ "$actualQuery" == "false" ]] ; then
     echo $line
+    numQueries=${line##*\ }
+    iteration=0
+    queryNum=0
     actualQuery=true
   elif [[ "$line" == *stop\ timing* ]] && $actualQuery ; then
     echo $line
@@ -66,9 +69,11 @@ while read line; do
   
   if $actualQuery ; then
     if [[ "$line" == Time\ taken* ]] ; then
-      echo $line
-    elif [[ "$line" == *--\ Iteration* ]]; then
-      echo $line
+      echo "Iteration "$iteration": "$line
+      (( queryNum++ ))
+      if [ $queryNum -eq $numQueries ] ; then
+        (( iteration++ ))
+      fi
     fi
   fi
 done < $BENCHMARK_LOG
