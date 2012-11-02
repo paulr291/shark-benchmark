@@ -40,6 +40,7 @@ do
   echo "" >> $ALL_QUERY
   echo "; -- start timing queries for $queryFile $numQueries" >> $ALL_QUERY
   # Append the actual query 10 times 
+
   for i in {1..2}
   do
     cat $QUERIES_DIR/$queryFile >> $ALL_QUERY
