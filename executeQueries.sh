@@ -69,10 +69,11 @@ while read line; do
   
   if $actualQuery ; then
     if [[ "$line" == Time\ taken* ]] || [[ "$line" == FAILED:* ]]; then
-      echo "Iteration "$iteration": "$line
+      echo "Iteration "$iteration" "$line
       (( queryNum++ ))
       if [ $queryNum -eq $numQueries ] ; then
         (( iteration++ ))
+        queryNum=0
       fi
     fi
   fi
