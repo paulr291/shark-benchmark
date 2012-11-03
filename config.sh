@@ -2,11 +2,14 @@
 
 # Run configurations
 # --------------------------------------------------
+# Results
+export RESULTS="results.txt"
+
 # Log of Shark output
 export BENCHMARK_LOG="benchmark.log"
 
 # Directory with queries to execute
-export QUERIES_DIR="tpch_q1"
+export QUERIES_DIR="queries"
 
 # Full query file created by concatenating queries in the directory of queries
 export ALL_QUERY="allQuery.hive"

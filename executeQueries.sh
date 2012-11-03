@@ -2,9 +2,10 @@
 source config.sh
 queryFiles=(`ls $QUERIES_DIR | sort`)
 
-# Empty log file and query file
-echo "" > $BENCHMARK_LOG
-echo "" > $ALL_QUERY
+# Empty result file, log file and query file
+cat /dev/null > $RESULTS
+cat /dev/null > $BENCHMARK_LOG
+cat /dev/null > $ALL_QUERY
 
 # Generate query file
 if [ -f $QUERIES_DIR"/setup.hive" ]; then
@@ -58,6 +59,8 @@ actualQuery=false
 while read line; do
   if [[ "$line" == *start\ timing* ]] && [[ "$actualQuery" == "false" ]] ; then
     echo $line
+    words=($line)
+    curQuery=${words[3]}
     numQueries=${line##*\ }
     iteration=0
     queryNum=0
@@ -70,6 +73,9 @@ while read line; do
   if $actualQuery ; then
     if [[ "$line" == Time\ taken* ]] || [[ "$line" == FAILED:* ]]; then
       echo "Iteration "$iteration" "$line
+      words=($line)
+      seconds=${words[2]}
+      echo $curQuery","$iteration","$seconds >> $RESULTS
       (( queryNum++ ))
       if [ $queryNum -eq $numQueries ] ; then
         (( iteration++ ))
