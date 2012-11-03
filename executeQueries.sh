@@ -1,6 +1,6 @@
 #!/bin/bash
 source config.sh
-queryFiles=(`ls $QUERIES_DIR`)
+queryFiles=(`ls $QUERIES_DIR | sort`)
 
 # Empty log file and query file
 echo "" > $BENCHMARK_LOG
@@ -38,15 +38,14 @@ do
   numQueries=`grep -c ";$" $QUERIES_DIR/$queryFile`
   # Delimiter for start of actual query.
   echo "" >> $ALL_QUERY
-  echo "; -- start timing queries for $queryFile $numQueries" >> $ALL_QUERY
+  echo "; -- start timing $queryFile $numQueries" >> $ALL_QUERY
   # Append the actual query 10 times 
-
-  for i in {1..2}
+  for (( i=0; i<ITERATIONS; i++ ))
   do
     cat $QUERIES_DIR/$queryFile >> $ALL_QUERY
   done
   # Delimiter for end of query
-  echo ";--stop timing queries for $queryFile" >> $ALL_QUERY
+  echo "; -- stop timing $queryFile" >> $ALL_QUERY
   echo "SHOW TABLES;" >> $ALL_QUERY
 done
 
@@ -69,7 +68,7 @@ while read line; do
   fi
   
   if $actualQuery ; then
-    if [[ "$line" == Time\ taken* ]] ; then
+    if [[ "$line" == Time\ taken* ]] || [[ "$line" == FAILED:* ]]; then
       echo "Iteration "$iteration": "$line
       (( queryNum++ ))
       if [ $queryNum -eq $numQueries ] ; then
@@ -79,4 +78,4 @@ while read line; do
   fi
 done < $BENCHMARK_LOG
 
-echo "Check $BENCHMARK_LOG for errors."
+echo "Check $BENCHMARK_LOG for full output."
