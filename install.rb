@@ -18,20 +18,16 @@ end
 $stderr.puts "Downloading Spark..."
 $stderr.puts `git clone git://github.com/mesos/spark.git` unless File.exists?("spark")
 $stderr.puts "Building branch #{ARGV[0]}. This may take a while."
-$stderr.puts `cd spark; git checkout -b #{ARGV[0]} #{ARGV[0]};`
-$stderr.puts `source ~/shark-benchmark/config.sh; cd spark; sbt/sbt clean publish-local`
+$stderr.puts `cd spark; git pull origin master; git reset --hard #{ARGV[0]};`
 $stderr.puts `cp ~/shark-benchmark/spark-env.sh ~/spark/conf`
-
-$stderr.puts "Setting up hive(shark-0.9)"
-$stderr.puts `yum -y install ant-antlr.noarch` # necessary on the EC2 instances
-$stderr.puts `git clone https://github.com/amplab/hive.git` unless File.exists?("hive")
-$stderr.puts `cd hive; git checkout shark-0.9; ant package`
+$stderr.puts `source ~/shark-benchmark/config.sh; cd spark; sbt/sbt clean publish-local`
 
 $stderr.puts "Downloading Shark..."
 $stderr.puts `git clone git://github.com/amplab/shark.git` unless File.exists?("shark")
 $stderr.puts "Building branch #{ARGV[1]}. This may take a while."
-$stderr.puts `source ~/shark-benchmark/config.sh; cd shark; git checkout -b #{ARGV[1]} #{ARGV[1]}; sbt/sbt products`
+$stderr.puts `cd shark; git pull origin master; git reset --hard #{ARGV[1]};`
 $stderr.puts `cp ~/shark-benchmark/shark-env.sh ~/shark/conf`
+$stderr.puts `source ~/shark-benchmark/config.sh; cd shark; sbt/sbt products`
 
 $stderr.puts `mesos-ec2/copy-dir spark`
 $stderr.puts `mesos-ec2/copy-dir shark`
