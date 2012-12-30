@@ -48,7 +48,7 @@ def main():
   sys.argv = sparkEc2Args.split()
   print sparkEc2Args
   
-  #sparkEc2.main()
+  sparkEc2.main()
 
   (opts, action, cluster_name) = sparkEc2.parse_args()
   conn = ec2.connect_to_region(opts.region) #default region

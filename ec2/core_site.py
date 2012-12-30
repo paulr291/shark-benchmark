@@ -17,6 +17,6 @@ def addProperty(doc, properties, propertyName, propertyValue):
 def addCredentials(filename):
   doc = xml.dom.minidom.parse(filename)
   properties = doc.childNodes[2]
-  addProperty(doc, properties, 'AWS_ACCESS_KEY_ID', os.getenv('AWS_ACCESS_KEY_ID'))
-  addProperty(doc, properties, 'AWS_SECRET_ACCESS_KEY', os.getenv('AWS_SECRET_ACCESS_KEY'))
+  addProperty(doc, properties, 'fs.s3n.awsAccessKeyId', os.getenv('AWS_ACCESS_KEY_ID'))
+  addProperty(doc, properties, 'fs.s3n.awsSecretAccessKey', os.getenv('AWS_SECRET_ACCESS_KEY'))
   doc.writexml(open(filename, "w"))
