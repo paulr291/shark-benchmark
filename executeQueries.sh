@@ -53,7 +53,7 @@ done
 
 # Execute queries
 echo "Executing $ALL_QUERY" | tee -a $BENCHMARK_LOG
-$SHARK_HOME/bin/shark-withinfo -f $ALL_QUERY 2>&1 | tee -a $BENCHMARK_LOG 
+/root/shark/bin/shark-withinfo -f $ALL_QUERY 2>&1 | tee -a $BENCHMARK_LOG 
 # Extract times
 actualQuery=false
 while read line; do

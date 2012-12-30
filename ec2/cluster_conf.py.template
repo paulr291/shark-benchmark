@@ -1,0 +1,17 @@
+import os
+
+#Set values to launch cluster
+
+SPARK_EC2 = {
+  "SPARK_HOME": "", #local copy of Spark for ec2 script
+  "KEY_PAIR": "",
+  "KEY_FILE": "",
+  "NUM_SLAVES": 1,
+  "INSTANCE_TYPE": "m1.large",
+  "CLUSTER_NAME": ""
+}
+
+ENV_VARS = {
+  "AWS_ACCESS_KEY_ID": "",
+  "AWS_SECRET_ACCESS_KEY": ""
+}

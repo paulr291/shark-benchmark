@@ -1,12 +1,12 @@
 #!/usr/bin/env ruby
 
 if ARGV.size != 2
-  $stderr.puts "Usage: ./install [Git Spark Commit Hash] [Git Shark Commit Hash]"
+  $stderr.puts "Usage: ./install.rb [Git Spark Commit Hash] [Git Shark Commit Hash]"
   exit 1
 end
 
 # Download scala, spark, shark, and hive to home directory
-# Assumes existence of ~/mesos-ec2, shark-0.9 hive, and scala-2.9.2
+# Assumes existence of ~/mesos-ec2 and shark-0.9 hive
 Dir.chdir
 if !File.exists?("scala-2.9.2")
   $stderr.puts "Downloading scala..."
