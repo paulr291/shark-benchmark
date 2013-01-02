@@ -68,6 +68,7 @@ do
   actualQuery=false
   while read line; do
     if [[ "$line" == *start\ executing* ]] ; then
+      words=($line)
       curQuery=${words[3]}
       queryFiles=( ${queryFiles[@]/$curQuery/} )
     elif [[ "$line" == *start\ timing* ]] && [[ "$actualQuery" == "false" ]] ; then

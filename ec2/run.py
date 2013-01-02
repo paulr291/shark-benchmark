@@ -64,8 +64,7 @@ def main():
   coreSiteFile = 'to_update/core-site.xml'
   print "Updating core-site.xml with credentials"
   scpWithOpts(master, opts, coreSiteFile, '~/ephemeral-hdfs/conf/core-site.xml', reverse=True)
-  # add credentials to core-site.xml
-
+  core_site.addCredentials(coreSiteFile)
   scpWithOpts(master, opts, coreSiteFile, '~/ephemeral-hdfs/conf/core-site.xml')
   print "Copying over shark-benchmark"
 
