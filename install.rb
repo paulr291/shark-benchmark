@@ -27,7 +27,6 @@ $stderr.puts `git clone git://github.com/amplab/shark.git` unless File.exists?("
 $stderr.puts "Building branch #{ARGV[1]}. This may take a while."
 $stderr.puts `cd shark; git pull origin master; git reset --hard #{ARGV[1]};`
 $stderr.puts `cp ~/shark-benchmark/shark-env.sh ~/shark/conf`
-$stderr.puts `echo $(curl http://169.254.169.254/latest/meta-data/public-ipv4) >> `~/shark/conf/shark-env.sh`
 $stderr.puts `source ~/shark-benchmark/config.sh; cd shark; sbt/sbt products`
 
 $stderr.puts `mesos-ec2/copy-dir spark`

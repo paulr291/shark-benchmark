@@ -59,16 +59,21 @@ def main():
 
   print "Updating copy-dir"
   scpWithOpts(master, opts, 'to_update/copy-dir', 'mesos-ec2/copy-dir') # ensure rsync has --delete
+
+  # Add credentials to core-site.xml
   coreSiteFile = 'to_update/core-site.xml'
   print "Updating core-site.xml with credentials"
   scpWithOpts(master, opts, coreSiteFile, '~/ephemeral-hdfs/conf/core-site.xml', reverse=True)
   # add credentials to core-site.xml
-  core_site.addCredentials(coreSiteFile)
+
   scpWithOpts(master, opts, coreSiteFile, '~/ephemeral-hdfs/conf/core-site.xml')
   print "Copying over shark-benchmark"
+
   scpWithOpts(master, opts, benchmarkHome, '~/shark-benchmark', flags='-r')
   print "Installing spark and shark on cluster"
+
   sparkEc2.ssh(master, opts, './shark-benchmark/install.rb %s %s' % (sparkHash, sharkHash))
+  sparkEc2.ssh(master, opts, 'cd shark-benchmark; ./executeQueries.sh')
 
 if __name__ == "__main__":
     main()

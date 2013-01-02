@@ -1,88 +1,105 @@
 #!/bin/bash
 source config.sh
+rm -rf tempQueries
+cp -r $QUERIES_DIR tempQueries
+QUERIES_DIR=tempQueries
 queryFiles=(`ls $QUERIES_DIR | sort`)
 
-# Empty result file, log file and query file
+# Set up result file and log files
 cat /dev/null > $RESULTS
 cat /dev/null > $BENCHMARK_LOG
-cat /dev/null > $ALL_QUERY
+cat /dev/null > temp.log
+echo "query name,iteration number,seconds" > $RESULTS
 
-# Generate query file
-if [ -f $QUERIES_DIR"/setup.hive" ]; then
-  cat $QUERIES_DIR"/setup.hive" >> $ALL_QUERY
-fi
+queryFiles=( ${queryFiles[@]/setup.hive/} )
+queryFiles=( ${queryFiles[@]/*_setup/} )
 
-for queryFile in ${queryFiles[@]}
+while [ ${#queryFiles[@]} -gt 0 ]
 do
-  if [[ "$queryFile" == "setup.hive" ]]; then 
-    continue
+  # Generate query file
+  cat /dev/null > $ALL_QUERY
+  if [ -f $QUERIES_DIR"/setup.hive" ]; then
+    cat $QUERIES_DIR"/setup.hive" >> $ALL_QUERY
   fi
 
-  if [[ "$queryFile" ==  *_setup ]]; then
-    continue
-  fi
-
-  if [ ! -f $QUERIES_DIR/$queryFile ]; then
-    echo "$queryFile not found" | tee -a $BENCHMARK_LOG
-    continue
-  fi
-
-  # If setup queries exist, add them to the query file first.
-  setupFile=$QUERIES_DIR/$queryFile"_setup"
-  echo $queryFile
-  echo $setupFile
-  if [ -f $setupFile ]
-  then
-    cat $setupFile >> $ALL_QUERY
-  fi
-
-  numQueries=`grep -c ";$" $QUERIES_DIR/$queryFile`
-  # Delimiter for start of actual query.
-  echo "" >> $ALL_QUERY
-  echo "; -- start timing $queryFile $numQueries" >> $ALL_QUERY
-  # Append the actual query 10 times 
-  for (( i=0; i<ITERATIONS; i++ ))
+  for queryFile in ${queryFiles[@]}
   do
-    cat $QUERIES_DIR/$queryFile >> $ALL_QUERY
+    if [ ! -f $QUERIES_DIR/$queryFile ]; then
+      echo "$queryFile not found" | tee -a $BENCHMARK_LOG
+      continue
+    fi
+
+    # Marks beginning of executing a query file
+    echo "; -- start executing: $queryFile" >> $ALL_QUERY
+    echo "SHOW TABLES;" >> $ALL_QUERY
+
+    # If setup queries exist, add them to the query file first.
+    setupFile=$QUERIES_DIR/$queryFile"_setup"
+    echo $queryFile
+    echo $setupFile
+    if [ -f $setupFile ]
+    then
+      cat $setupFile >> $ALL_QUERY
+    fi
+    
+    numQueries=`grep -c ";$" $QUERIES_DIR/$queryFile`
+    # Delimiter for start of actual query.
+    echo "" >> $ALL_QUERY
+    echo "; -- start timing $queryFile $numQueries" >> $ALL_QUERY
+    # Append the actual query ITERATIONS times 
+    for (( i=0; i<ITERATIONS; i++ ))
+    do
+      cat $QUERIES_DIR/$queryFile >> $ALL_QUERY
+    done
+    # Delimiter for end of query
+    echo "; -- stop timing $queryFile" >> $ALL_QUERY
+    echo "SHOW TABLES;" >> $ALL_QUERY
   done
-  # Delimiter for end of query
-  echo "; -- stop timing $queryFile" >> $ALL_QUERY
-  echo "SHOW TABLES;" >> $ALL_QUERY
-done
 
 
-# Execute queries
-echo "Executing $ALL_QUERY" | tee -a $BENCHMARK_LOG
-/root/shark/bin/shark-withinfo -f $ALL_QUERY 2>&1 | tee -a $BENCHMARK_LOG 
-# Extract times
-actualQuery=false
-while read line; do
-  if [[ "$line" == *start\ timing* ]] && [[ "$actualQuery" == "false" ]] ; then
-    echo $line
-    words=($line)
-    curQuery=${words[3]}
-    numQueries=${line##*\ }
-    iteration=0
-    queryNum=0
-    actualQuery=true
-  elif [[ "$line" == *stop\ timing* ]] && $actualQuery ; then
-    echo $line
-    actualQuery=false
-  fi
+  # Execute queries
+  echo "Executing $ALL_QUERY" | tee -a temp.log
+  /root/shark/bin/shark-withinfo -f $ALL_QUERY 2>&1 | tee -a temp.log
   
-  if $actualQuery ; then
-    if [[ "$line" == Time\ taken* ]] || [[ "$line" == FAILED:* ]]; then
-      echo "Iteration "$iteration" "$line
+  unset queryFiles[0] # ensure removal of the first query if setup query fails
+  queryFiles=("${queryFiles[@]}")
+
+  # Extract times
+  actualQuery=false
+  while read line; do
+    if [[ "$line" == *start\ executing* ]] ; then
+      curQuery=${words[3]}
+      queryFiles=( ${queryFiles[@]/$curQuery/} )
+    elif [[ "$line" == *start\ timing* ]] && [[ "$actualQuery" == "false" ]] ; then
+      echo $line
       words=($line)
-      seconds=${words[2]}
-      echo $curQuery","$iteration","$seconds >> $RESULTS
-      (( queryNum++ ))
-      if [ $queryNum -eq $numQueries ] ; then
-        (( iteration++ ))
-        queryNum=0
+      curQuery=${words[3]}
+      numQueries=${line##*\ }
+      iteration=0
+      queryNum=0
+      actualQuery=true
+    elif [[ "$line" == *stop\ timing* ]] && $actualQuery ; then
+      echo $line
+      actualQuery=false
+    fi
+    
+    if $actualQuery ; then
+      if [[ "$line" == Time\ taken* ]]; then
+        echo "Iteration "$iteration" "$line
+        words=($line)
+        seconds=${words[2]}
+        echo $curQuery","$iteration","$seconds >> $RESULTS
+        (( queryNum++ ))
+        if [ $queryNum -eq $numQueries ] ; then
+          (( iteration++ ))
+          queryNum=0
+        fi
       fi
     fi
-  fi
-done < $BENCHMARK_LOG
+  done < temp.log
+  cat temp.log >> $BENCHMARK_LOG
+  cat /dev/null > temp.log
+done
 
+cat $RESULTS
 echo "Check $BENCHMARK_LOG for full output."
