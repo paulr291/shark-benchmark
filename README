@@ -1,0 +1,25 @@
+This project provides a framework for automating benchmarking for Shark.
+
+The directory ec2 provides scripts and configuration files for setting up an ec2 cluster and running the tests on it.
+The README in that directory explains its use.
+
+To run on a given cluster, 
+clone this repository into the master, 
+execute "./install.rb [Git Spark Commit Hash] [Git Shark Commit Hash]" which installs the given version of Spark and Shark and copy the tpch data onto hdfs,
+modify the necessary configuration parameters, 
+and execute "./executeQueries.sh".
+
+The following needs to be set in config.sh:
+  RESULTS - the file the csv result will be saved to. It will be in the format "query name,iteration number,seconds".
+  BENCHMARK_LOG - the file the output of Shark will be saved to
+  QUERIES_DIR - the directory of queries to run (more info below)
+  ALL_QUERY - the file that will hold the queries concatenated together to be run by Shark
+  ITERATIONS - number of times to execute each timed query 
+
+There are three kind of files that should be in QUERIES_DIR:
+  setup.hive - There should be one of these and it will be executed once when Shark starts up
+  *.hive - These contain queries that will be timed. They will be executed ITERATIONS number of times.
+  *.hive_setup - Each corresponds to a *.hive file. These are run once before executing the corresponding file ITERATIONS number of times.
+For examples, see tpch_q1 and queries.
+
+
